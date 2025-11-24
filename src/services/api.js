@@ -68,9 +68,11 @@ export const cursosAPI = {
 export const videosAPI = {
   obtenerPorCurso: (cursoId) => api.get(`/videos/curso/${cursoId}`),
   obtenerPorId: (id) => api.get(`/videos/${id}`),
-  agregar: (cursoId, formData) => api.post(`/videos/curso/${cursoId}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+  subirVideo: (cursoId, formData) =>
+  api.post(`/videos/curso/${cursoId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   }),
+
   actualizar: (id, formData) => api.put(`/videos/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),

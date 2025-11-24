@@ -92,6 +92,7 @@ function AppContent() {
     try {
       const response = await cursosAPI.obtenerPorId(cursoId);
       setCursoSeleccionado(response.data);
+      console.log("Curso cargado:", { id: response.data.id, publicado: response.data.publicado, videosCount: response.data.listaVideos?.length });
       setVideos(response.data.listaVideos || []);
       setVistaActual('curso-detalle');
       setError(null);
@@ -100,6 +101,18 @@ function AppContent() {
       console.error(err);
     } finally {
       setCargando(false);
+    }
+  };
+
+  const publicarCurso = async (cursoId) => {
+    try {
+      await cursosAPI.publicar(cursoId);
+      console.log("Publicando curso ID:", cursoId);
+      alert('Curso publicado exitosamente');
+      verDetalleCurso(cursoId);
+    } catch (err) {
+      console.error('Error al publicar:', err);
+      alert('Error al publicar el curso');
     }
   };
 
@@ -494,25 +507,56 @@ function AppContent() {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-md p-4">
-                <h3 className="font-bold text-lg mb-4">Contenido del Curso</h3>
-                <div className="space-y-2">
-                  {videos.length > 0 ? videos.map(video => (
-                    <div key={video.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded cursor-pointer border border-gray-200">
-                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
-                        {video.numero}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{video.titulo}</p>
-                        <p className="text-xs text-gray-500">{video.duracion}</p>
-                      </div>
-                    </div>
-                  )) : (
-                    <p className="text-gray-500 text-center py-4">No hay videos en este curso</p>
-                  )}
-                </div>
-              </div>
+  <div className="bg-white rounded-lg shadow-md p-4">
+    <h3 className="font-bold text-lg mb-4">Contenido del Curso</h3>
+
+    {/* ➜ BOTONES SOLO PARA INSTRUCTORES */}
+    {isAuthenticated() && isInstructor() && (
+      <div className="mb-4 space-y-2">
+        <button
+          onClick={() => setVistaActual('agregar-video')}
+          className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          <Plus size={18} />
+          Agregar Video
+        </button>
+        
+        {videos.length > 0 && !cursoSeleccionado.publicado && (
+          <button
+            onClick={() => publicarCurso(cursoSeleccionado.id)}
+            className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+          >
+            Publicar Curso
+          </button>
+        )}
+      </div>
+    )}
+
+    <div className="space-y-2">
+      {videos.length > 0 ? (
+        videos.map((video) => (
+          <div
+            key={video.id}
+            className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded cursor-pointer border border-gray-200"
+          >
+            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+              {video.numero}
             </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm truncate">{video.titulo}</p>
+              <p className="text-xs text-gray-500">{video.duracion}</p>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-500 text-center py-4">
+          No hay videos en este curso
+        </p>
+      )}
+    </div>
+  </div>
+</div>
+
           </div>
         ) : null}
       </div>
@@ -634,6 +678,123 @@ function AppContent() {
     );
   };
 
+  const AgregarVideo = () => {
+  const [titulo, setTitulo] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [orden, setOrden] = useState('');
+  const [archivo, setArchivo] = useState(null);
+  const [duracion, setDuracion] = useState('');
+  const [error, setError] = useState('');
+  const [exito, setExito] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!archivo) {
+      setError("Debes seleccionar un archivo");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("titulo", titulo);
+    formData.append("descripcion", descripcion);
+    formData.append("orden", orden);
+    formData.append("duracionSegundos", duracion);
+    formData.append("archivo", archivo);
+
+    try {
+      await videosAPI.subirVideo(cursoSeleccionado.id, formData);
+      setExito(true);
+      setTimeout(() => {
+        verDetalleCurso(cursoSeleccionado.id);
+      }, 1500);
+    } catch (err) {
+      setError("Error al subir el video");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <button
+          onClick={() => setVistaActual('curso-detalle')}
+          className="mb-6 text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
+          ← Volver al curso
+        </button>
+
+        <h1 className="text-3xl font-bold mb-6">Agregar Video</h1>
+
+        {error && (
+          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
+        )}
+        {exito && (
+          <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
+            ¡Video subido correctamente!
+          </div>
+        )}
+
+        <div className="bg-white p-6 rounded-lg shadow space-y-4">
+
+          <div>
+            <label className="block mb-1 text-sm font-medium">Título *</label>
+            <input 
+              className="w-full border p-2 rounded"
+              value={titulo}
+              onChange={e => setTitulo(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium">Descripción</label>
+            <textarea 
+              className="w-full border p-2 rounded"
+              value={descripcion}
+              onChange={e => setDescripcion(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium">Orden *</label>
+            <input 
+              type="number"
+              className="w-full border p-2 rounded"
+              value={orden}
+              onChange={e => setOrden(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium">Duración (segundos)</label>
+            <input 
+              type="number"
+              className="w-full border p-2 rounded"
+              value={duracion}
+              onChange={e => setDuracion(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium">Archivo de video *</label>
+            <input 
+              type="file"
+              accept="video/*"
+              onChange={e => setArchivo(e.target.files[0])}
+            />
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+          >
+            Subir Video
+          </button>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar />
@@ -642,6 +803,7 @@ function AppContent() {
       {(vistaActual === 'cursos' || vistaActual === 'mis-cursos') && <Cursos />}
       {vistaActual === 'curso-detalle' && <CursoDetalle />}
       {vistaActual === 'subir' && <SubirContenido />}
+      {vistaActual === 'agregar-video' && <AgregarVideo />}
     </div>
   );
 }
