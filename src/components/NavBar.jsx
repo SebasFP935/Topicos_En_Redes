@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { BookOpen, User, Upload, Menu, X, LogOut } from 'lucide-react';
+import { BookOpen, User, Upload, Menu, X, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function NavBar({ setVistaActual }) {
-  const { user, logout, isAuthenticated, isInstructor } = useAuth();
+  const { user, logout, isAuthenticated, isInstructor, isAdmin } = useAuth();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   return (
@@ -19,6 +19,17 @@ export default function NavBar({ setVistaActual }) {
             <button onClick={() => setVistaActual('cursos')} className="hover:text-blue-200 transition">
               Explorar Cursos
             </button>
+
+            {isAuthenticated() && isAdmin() && (
+              <button 
+                onClick={() => setVistaActual('admin-dashboard')} 
+                className="flex items-center gap-1 hover:text-blue-200 transition"
+              >
+                <Shield size={18} />
+                Admin
+              </button>
+            )}
+
             {isAuthenticated() && isInstructor() && (
               <>
                 <button onClick={() => setVistaActual('mis-cursos')} className="hover:text-blue-200 transition">
@@ -30,9 +41,13 @@ export default function NavBar({ setVistaActual }) {
                 </button>
               </>
             )}
+
             {isAuthenticated() ? (
               <div className="flex items-center gap-4">
-                <span className="text-sm">{user.nombre}</span>
+                <div className="flex flex-col items-end">
+                  <span className="text-sm font-semibold">{user.nombre}</span>
+                  <span className="text-xs text-blue-200">{user.rol}</span>
+                </div>
                 <button onClick={logout} className="hover:text-blue-200 transition flex items-center gap-1">
                   <LogOut size={18} />
                   Salir
@@ -56,6 +71,13 @@ export default function NavBar({ setVistaActual }) {
             <button onClick={() => { setVistaActual('cursos'); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
               Explorar Cursos
             </button>
+
+            {isAuthenticated() && isAdmin() && (
+              <button onClick={() => { setVistaActual('admin-dashboard'); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
+                Panel de Administración
+              </button>
+            )}
+
             {isAuthenticated() && isInstructor() && (
               <>
                 <button onClick={() => { setVistaActual('mis-cursos'); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
@@ -66,10 +88,17 @@ export default function NavBar({ setVistaActual }) {
                 </button>
               </>
             )}
+
             {isAuthenticated() ? (
-              <button onClick={() => { logout(); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
-                Cerrar Sesión
-              </button>
+              <>
+                <div className="px-2 py-2 text-sm border-t border-blue-500 mt-2">
+                  <div className="font-semibold">{user.nombre}</div>
+                  <div className="text-xs text-blue-200">{user.rol}</div>
+                </div>
+                <button onClick={() => { logout(); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
+                  Cerrar Sesión
+                </button>
+              </>
             ) : (
               <button onClick={() => { setVistaActual('login'); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
                 Iniciar Sesión

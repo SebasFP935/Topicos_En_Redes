@@ -69,10 +69,9 @@ export const videosAPI = {
   obtenerPorCurso: (cursoId) => api.get(`/videos/curso/${cursoId}`),
   obtenerPorId: (id) => api.get(`/videos/${id}`),
   subirVideo: (cursoId, formData) =>
-  api.post(`/videos/curso/${cursoId}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  }),
-
+    api.post(`/videos/curso/${cursoId}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
   actualizar: (id, formData) => api.put(`/videos/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
@@ -86,6 +85,28 @@ export const categoriasAPI = {
   crear: (data) => api.post('/categorias', data),
   actualizar: (id, data) => api.put(`/categorias/${id}`, data),
   eliminar: (id) => api.delete(`/categorias/${id}`),
+};
+
+// Admin APIs
+export const adminAPI = {
+  // Estadísticas
+  obtenerEstadisticas: () => api.get('/admin/estadisticas'),
+  
+  // Usuarios
+  obtenerUsuarios: () => api.get('/admin/usuarios'),
+  obtenerUsuarioPorId: (id) => api.get(`/admin/usuarios/${id}`),
+  crearUsuario: (data) => api.post('/admin/usuarios', data),
+  actualizarUsuario: (id, data) => api.put(`/admin/usuarios/${id}`, data),
+  cambiarEstadoUsuario: (id, activo) => api.patch(`/admin/usuarios/${id}/estado?activo=${activo}`),
+  eliminarUsuario: (id) => api.delete(`/admin/usuarios/${id}`),
+  
+  // Cursos
+  obtenerCursos: () => api.get('/admin/cursos'),
+  eliminarCurso: (id) => api.delete(`/admin/cursos/${id}`),
+  cambiarEstadoCurso: (id, publicado) => api.patch(`/admin/cursos/${id}/estado?publicado=${publicado}`),
+  
+  // Videos
+  eliminarVideo: (id) => api.delete(`/admin/videos/${id}`),
 };
 
 export default api;

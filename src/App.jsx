@@ -8,9 +8,13 @@ import Cursos from './components/Cursos';
 import CursoDetalle from './components/CursoDetalle';
 import SubirContenido from './components/SubirContenido';
 import AgregarVideo from './components/AgregarVideo';
+import AdminDashboard from './components/AdminDashboard';
+import AdminUsuarios from './components/AdminUsuarios';
+import AdminCursos from './components/AdminCursos';
+import AdminCategorias from './components/AdminCategorias';
 
 function AppContent() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const [vistaActual, setVistaActual] = useState('home');
   
   const {
@@ -99,6 +103,30 @@ function AppContent() {
           setVistaActual={setVistaActual}
           verDetalleCurso={handleVerDetalleCurso}
         />
+      )}
+
+      {/* RUTAS DE ADMINISTRADOR */}
+      {isAuthenticated() && isAdmin() && (
+        <>
+          {vistaActual === 'admin-dashboard' && (
+            <AdminDashboard setVistaActual={setVistaActual} />
+          )}
+          
+          {vistaActual === 'admin-usuarios' && (
+            <AdminUsuarios setVistaActual={setVistaActual} />
+          )}
+          
+          {vistaActual === 'admin-cursos' && (
+            <AdminCursos 
+              setVistaActual={setVistaActual}
+              verDetalleCurso={handleVerDetalleCurso}
+            />
+          )}
+          
+          {vistaActual === 'admin-categorias' && (
+            <AdminCategorias setVistaActual={setVistaActual} />
+          )}
+        </>
       )}
     </div>
   );

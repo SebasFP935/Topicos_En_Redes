@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isInstructor = () => {
-    return user?.rol === 'INSTRUCTOR' || user?.rol === 'ADMIN';
+    return user?.rol === 'INSTRUCTOR';
   };
 
   const isAdmin = () => {
