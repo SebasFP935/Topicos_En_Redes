@@ -14,8 +14,14 @@ import AdminCursos from './components/AdminCursos';
 import AdminCategorias from './components/AdminCategorias';
 
 function AppContent() {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
   const [vistaActual, setVistaActual] = useState('home');
+
+  // Función para cerrar sesión y redirigir al login
+  const handleLogout = () => {
+    logout();
+    setVistaActual('login');
+  };
   
   const {
     cursos,
@@ -50,7 +56,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavBar setVistaActual={setVistaActual} />
+      <NavBar setVistaActual={setVistaActual} handleLogout={handleLogout} />
       
       {vistaActual === 'login' && <Login setVistaActual={setVistaActual} />}
       

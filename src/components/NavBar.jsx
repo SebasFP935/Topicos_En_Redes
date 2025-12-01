@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { BookOpen, User, Upload, Menu, X, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function NavBar({ setVistaActual }) {
-  const { user, logout, isAuthenticated, isInstructor, isAdmin } = useAuth();
+export default function NavBar({ setVistaActual, handleLogout }) {
+  const { user, isAuthenticated, isInstructor, isAdmin } = useAuth();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   return (
@@ -48,7 +48,7 @@ export default function NavBar({ setVistaActual }) {
                   <span className="text-sm font-semibold">{user.nombre}</span>
                   <span className="text-xs text-blue-200">{user.rol}</span>
                 </div>
-                <button onClick={logout} className="hover:text-blue-200 transition flex items-center gap-1">
+                <button onClick={handleLogout} className="hover:text-blue-200 transition flex items-center gap-1">
                   <LogOut size={18} />
                   Salir
                 </button>
@@ -95,7 +95,7 @@ export default function NavBar({ setVistaActual }) {
                   <div className="font-semibold">{user.nombre}</div>
                   <div className="text-xs text-blue-200">{user.rol}</div>
                 </div>
-                <button onClick={() => { logout(); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
+                <button onClick={() => { handleLogout(); setMenuAbierto(false); }} className="block w-full text-left py-2 hover:bg-blue-700 px-2 rounded">
                   Cerrar Sesión
                 </button>
               </>
