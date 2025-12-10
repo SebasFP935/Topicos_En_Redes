@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Users, BookOpen, Video, TrendingUp } from 'lucide-react';
+import { Users, BookOpen, Video, TrendingUp, Star } from 'lucide-react';
 import { useAdmin } from '../hooks/UseAdmin';
 
 export default function AdminDashboard({ setVistaActual }) {
@@ -41,6 +41,14 @@ export default function AdminDashboard({ setVistaActual }) {
       icon: TrendingUp,
       color: 'bg-orange-500',
       onClick: () => setVistaActual('admin-categorias')
+    },
+    {
+      titulo: 'Calificaciones',
+      valor: estadisticas?.totalCalificaciones || 0,
+      subtitulo: 'Calificaciones de cursos',
+      icon: Star,
+      color: 'bg-yellow-500',
+      onClick: () => setVistaActual('admin-calificaciones')
     }
   ];
 

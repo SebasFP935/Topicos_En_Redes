@@ -16,7 +16,34 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(userData));
     }
     setLoading(false);
-  }, []);
+
+    // Listener para sincronizar sesiones entre pestañas
+    const handleStorageChange = (e) => {
+      // Solo reaccionar a cambios del token
+      if (e.key === 'token') {
+        if (e.newValue === null) {
+          // El token fue removido en otra pestaña - cerrar sesión aquí también
+          console.log('Sesión cerrada en otra pestaña, cerrando sesión aquí...');
+          setUser(null);
+          localStorage.removeItem('user');
+        } else if (e.newValue && !user) {
+          // Se inició sesión en otra pestaña - cargar usuario aquí también
+          const userData = localStorage.getItem('user');
+          if (userData) {
+            console.log('Sesión iniciada en otra pestaña, sincronizando...');
+            setUser(JSON.parse(userData));
+          }
+        }
+      }
+    };
+
+    // El evento 'storage' solo se dispara en otras pestañas, no en la actual
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [user]);
 
   const login = async (credentials) => {
     try {

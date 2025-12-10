@@ -87,6 +87,14 @@ export const categoriasAPI = {
   eliminar: (id) => api.delete(`/categorias/${id}`),
 };
 
+// Calificaciones APIs
+export const calificacionesAPI = {
+  calificar: (cursoId, puntuacion) => api.post(`/calificaciones/curso/${cursoId}`, { puntuacion }),
+  obtenerMiCalificacion: (cursoId) => api.get(`/calificaciones/curso/${cursoId}/mi-calificacion`),
+  obtenerResumen: (cursoId) => api.get(`/calificaciones/curso/${cursoId}/resumen`),
+  eliminar: (cursoId) => api.delete(`/calificaciones/curso/${cursoId}`),
+};
+
 // Admin APIs
 export const adminAPI = {
   // Estadísticas
@@ -107,6 +115,17 @@ export const adminAPI = {
   
   // Videos
   eliminarVideo: (id) => api.delete(`/admin/videos/${id}`),
+  
+  // Calificaciones
+  obtenerCalificaciones: (params) => {
+    const queryParams = new URLSearchParams();
+    if (params?.cursoId) queryParams.append('cursoId', params.cursoId);
+    if (params?.usuarioId) queryParams.append('usuarioId', params.usuarioId);
+    if (params?.fechaDesde) queryParams.append('fechaDesde', params.fechaDesde);
+    if (params?.fechaHasta) queryParams.append('fechaHasta', params.fechaHasta);
+    return api.get(`/admin/calificaciones?${queryParams}`);
+  },
+  eliminarCalificacion: (id) => api.delete(`/admin/calificaciones/${id}`),
 };
 
 export default api;

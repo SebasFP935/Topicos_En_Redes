@@ -12,7 +12,7 @@ export default function NavBar({ setVistaActual, handleLogout }) {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setVistaActual('home')}>
             <BookOpen size={28} />
-            <span className="text-xl font-bold">UniTutoriales</span>
+            <span className="text-xl font-bold">UPBmy</span>
           </div>
           
           <div className="hidden md:flex items-center gap-6">

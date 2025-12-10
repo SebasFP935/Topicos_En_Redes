@@ -12,9 +12,10 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminUsuarios from './components/AdminUsuarios';
 import AdminCursos from './components/AdminCursos';
 import AdminCategorias from './components/AdminCategorias';
+import AdminCalificaciones from './components/AdminCalificaciones';
 
 function AppContent() {
-  const { isAuthenticated, isAdmin, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [vistaActual, setVistaActual] = useState('home');
 
   // Función para cerrar sesión y redirigir al login
@@ -22,6 +23,15 @@ function AppContent() {
     logout();
     setVistaActual('login');
   };
+
+  // Observar cambios en la autenticación y redirigir si se cierra sesión
+  useEffect(() => {
+    if (!user && vistaActual !== 'login' && vistaActual !== 'home' && vistaActual !== 'cursos') {
+      // Si el usuario se deslogeó y no está en una vista pública, redirigir al login
+      console.log('Usuario desconectado, redirigiendo al login...');
+      setVistaActual('login');
+    }
+  }, [user, vistaActual]);
   
   const {
     cursos,
@@ -131,6 +141,10 @@ function AppContent() {
           
           {vistaActual === 'admin-categorias' && (
             <AdminCategorias setVistaActual={setVistaActual} />
+          )}
+          
+          {vistaActual === 'admin-calificaciones' && (
+            <AdminCalificaciones setVistaActual={setVistaActual} />
           )}
         </>
       )}
