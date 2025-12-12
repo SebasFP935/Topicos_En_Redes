@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Star, Play, Award, Users, BookOpen, TrendingUp, ArrowRight } from 'lucide-react';
+import { Star, Play, Award, Users, BookOpen, TrendingUp, ArrowRight, Eye } from 'lucide-react';
 import { calificacionesAPI } from '../services/api';
 
 export default function Home({ cursos, categorias, cargando, setVistaActual, verDetalleCurso }) {
@@ -176,6 +176,14 @@ export default function Home({ cursos, categorias, cargando, setVistaActual, ver
                       </span>
                       <span className="font-medium text-upb-blue-600">{curso.duracion}</span>
                     </div>
+
+                    {/* 🆕 Mostrar visualizaciones */}
+                    {curso.totalVistas !== undefined && curso.totalVistas > 0 && (
+                      <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t text-purple-600">
+                        <Eye size={16} />
+                        <span className="text-sm font-semibold">{curso.totalVistas.toLocaleString()} vistas</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );

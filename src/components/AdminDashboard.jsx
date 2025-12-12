@@ -1,6 +1,6 @@
 // src/components/AdminDashboard.jsx
 import React, { useEffect } from 'react';
-import { Users, BookOpen, Video, TrendingUp, Star, ArrowRight, BarChart3, Activity } from 'lucide-react';
+import { Users, BookOpen, Video, TrendingUp, Star, ArrowRight, BarChart3, Activity, Eye } from 'lucide-react';
 import { useAdmin } from '../hooks/UseAdmin';
 
 export default function AdminDashboard({ setVistaActual }) {
@@ -60,6 +60,16 @@ export default function AdminDashboard({ setVistaActual }) {
       bgColor: 'bg-yellow-50',
       textColor: 'text-upb-yellow-600',
       onClick: () => setVistaActual('admin-calificaciones')
+    },
+    {
+      titulo: 'Visualizaciones',
+      valor: estadisticas?.totalVisualizaciones || 0,
+      subtitulo: 'Reproducciones de videos',
+      icon: Eye,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-50',
+      textColor: 'text-purple-600',
+      onClick: () => setVistaActual('admin-visualizaciones')
     }
   ];
 
@@ -85,7 +95,7 @@ export default function AdminDashboard({ setVistaActual }) {
         ) : (
           <>
             {/* Cards de estadísticas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
               {cards.map((card, index) => {
                 const Icon = card.icon;
                 return (
@@ -179,6 +189,22 @@ export default function AdminDashboard({ setVistaActual }) {
                         <div className="text-sm text-yellow-600">Ver y moderar valoraciones</div>
                       </div>
                       <ArrowRight className="text-yellow-600 group-hover:translate-x-1 transition-transform" size={20} />
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setVistaActual('admin-visualizaciones')}
+                    className="group w-full text-left px-6 py-4 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 rounded-xl transition-all duration-300 border-2 border-transparent hover:border-purple-300"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-bold text-purple-800 text-lg mb-1 flex items-center gap-2">
+                          <Eye size={20} />
+                          Gestionar Visualizaciones
+                        </div>
+                        <div className="text-sm text-purple-600">Analytics de reproducciones</div>
+                      </div>
+                      <ArrowRight className="text-purple-600 group-hover:translate-x-1 transition-transform" size={20} />
                     </div>
                   </button>
                 </div>

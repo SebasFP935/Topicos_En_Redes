@@ -1,8 +1,8 @@
 // src/components/CursoDetalle.jsx
-import React, { useState, useEffect } from 'react';
-import { Play, Plus, Trash2, Clock, Film, Award, Share2, Bookmark, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Plus, Trash2, Clock, Film, Award, Share2, Bookmark, ArrowLeft, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { calificacionesAPI } from '../services/api';
+import { calificacionesAPI, visualizacionesAPI } from '../services/api';
 import StarRating from './StarRating';
 
 export default function CursoDetalle({ 
@@ -17,12 +17,40 @@ export default function CursoDetalle({
   const [miCalificacion, setMiCalificacion] = useState(null);
   const [resumenCalificaciones, setResumenCalificaciones] = useState(null);
   const [cargandoCalificacion, setCargandoCalificacion] = useState(false);
+  const videoRef = useRef(null);
+  const vistaRegistrada = useRef(false);
 
   useEffect(() => {
     if (videos.length > 0 && !videoActual) {
       setVideoActual(videos[0]);
     }
   }, [videos]);
+
+  // 🆕 Registrar visualización cuando el video se reproduce
+  useEffect(() => {
+    if (videoActual && videoRef.current) {
+      vistaRegistrada.current = false;
+      
+      const handlePlay = async () => {
+        if (!vistaRegistrada.current && videoActual.id) {
+          try {
+            await visualizacionesAPI.registrarVista(videoActual.id);
+            vistaRegistrada.current = true;
+            console.log(`Vista registrada para video ${videoActual.id}`);
+          } catch (error) {
+            console.error('Error al registrar vista:', error);
+          }
+        }
+      };
+
+      const videoElement = videoRef.current;
+      videoElement.addEventListener('play', handlePlay);
+
+      return () => {
+        videoElement.removeEventListener('play', handlePlay);
+      };
+    }
+  }, [videoActual]);
 
   useEffect(() => {
     if (cursoSeleccionado) {
@@ -83,6 +111,7 @@ export default function CursoDetalle({
 
   const cambiarVideo = (video) => {
     setVideoActual(video);
+    vistaRegistrada.current = false; // Reset para el nuevo video
   };
 
   const esInstructorDelCurso = () => {
@@ -116,6 +145,7 @@ export default function CursoDetalle({
               <div className="bg-black rounded-2xl overflow-hidden shadow-upb-xl" style={{aspectRatio: '16/9'}}>
                 {videoActual && videoActual.urlVideo ? (
                   <video 
+                    ref={videoRef}
                     key={videoActual.id}
                     controls 
                     className="w-full h-full"
@@ -149,7 +179,7 @@ export default function CursoDetalle({
                         {cursoSeleccionado.categoria}
                       </span>
                     </div>
-                    </div>
+                  </div>
                   <div className="flex gap-2">
                     <button className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" title="Compartir">
                       <Share2 size={20} className="text-gray-600" />
@@ -159,212 +189,240 @@ export default function CursoDetalle({
                     </button>
                   </div>
                 </div>
-                 {/* Calificaciones */}
-            <div className="mb-6 pb-6 border-b">
-              {resumenCalificaciones && resumenCalificaciones.totalCalificaciones > 0 && (
-                <div className="flex items-center gap-6 mb-4">
-                  <div className="flex items-center gap-3 bg-yellow-50 px-4 py-3 rounded-xl">
-                    <StarRating 
-                      rating={resumenCalificaciones.promedioCalificacion} 
-                      readonly 
-                      size={24}
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-2xl font-bold text-gray-800">
-                        {resumenCalificaciones.promedioCalificacion.toFixed(1)}
-                      </span>
-                      <span className="text-xs text-gray-600">
-                        {resumenCalificaciones.totalCalificaciones} {resumenCalificaciones.totalCalificaciones === 1 ? 'calificación' : 'calificaciones'}
-                      </span>
+
+                {/* Calificaciones */}
+                <div className="mb-6 pb-6 border-b">
+                  {resumenCalificaciones && resumenCalificaciones.totalCalificaciones > 0 && (
+                    <div className="flex items-center gap-6 mb-4">
+                      <div className="flex items-center gap-3 bg-yellow-50 px-4 py-3 rounded-xl">
+                        <StarRating 
+                          rating={resumenCalificaciones.promedioCalificacion} 
+                          readonly 
+                          size={24}
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-2xl font-bold text-gray-800">
+                            {resumenCalificaciones.promedioCalificacion.toFixed(1)}
+                          </span>
+                          <span className="text-xs text-gray-600">
+                            {resumenCalificaciones.totalCalificaciones} {resumenCalificaciones.totalCalificaciones === 1 ? 'calificación' : 'calificaciones'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
+                  )}
+
+                  {/* Calificar */}
+                  {isAuthenticated() && !esInstructorDelCurso() && (
+                    <div className="bg-gradient-to-r from-upb-blue-50 to-blue-50 p-5 rounded-xl">
+                      <p className="text-sm font-semibold text-gray-700 mb-3">
+                        {miCalificacion ? '⭐ Tu calificación:' : '✨ ¿Qué te pareció este curso?'}
+                      </p>
+                      <div className="flex items-center gap-4">
+                        <StarRating 
+                          rating={miCalificacion?.puntuacion || 0} 
+                          onRate={handleCalificar}
+                          size={32}
+                          readonly={cargandoCalificacion}
+                        />
+                        {miCalificacion && (
+                          <button
+                            onClick={handleEliminarCalificacion}
+                            disabled={cargandoCalificacion}
+                            className="text-red-600 hover:text-red-700 flex items-center gap-2 text-sm font-medium transition-colors"
+                            title="Eliminar calificación"
+                          >
+                            <Trash2 size={16} />
+                            Eliminar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {esInstructorDelCurso() && (
+                    <div className="bg-gray-50 p-4 rounded-xl text-sm text-gray-600">
+                      ℹ️ No puedes calificar tu propio curso
+                    </div>
+                  )}
+                </div>
+
+                {/* Descripción */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3">📋 Descripción del Curso</h3>
+                  <p className="text-gray-600 leading-relaxed">{cursoSeleccionado.descripcion}</p>
+                </div>
+
+                {/* Estadísticas */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="bg-upb-blue-50 p-4 rounded-xl text-center">
+                    <Film className="mx-auto mb-2 text-upb-blue-600" size={24} />
+                    <div className="text-2xl font-bold text-gray-800">{cursoSeleccionado.videos}</div>
+                    <div className="text-sm text-gray-600">Videos</div>
+                  </div>
+                  <div className="bg-upb-yellow-50 p-4 rounded-xl text-center">
+                    <Clock className="mx-auto mb-2 text-upb-yellow-600" size={24} />
+                    <div className="text-2xl font-bold text-gray-800">{cursoSeleccionado.duracion}</div>
+                    <div className="text-sm text-gray-600">Duración</div>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-xl text-center">
+                    <Award className="mx-auto mb-2 text-green-600" size={24} />
+                    <div className="text-2xl font-bold text-gray-800">
+                      {resumenCalificaciones?.totalCalificaciones || 0}
+                    </div>
+                    <div className="text-sm text-gray-600">Valoraciones</div>
+                  </div>
+                  {/* 🆕 Visualizaciones totales del curso */}
+                  <div className="bg-purple-50 p-4 rounded-xl text-center md:col-span-3">
+                    <Eye className="mx-auto mb-2 text-purple-600" size={24} />
+                    <div className="text-2xl font-bold text-gray-800">
+                      {cursoSeleccionado.totalVistas || 0}
+                    </div>
+                    <div className="text-sm text-gray-600">Visualizaciones totales</div>
                   </div>
                 </div>
-              )}
 
-              {/* Calificar */}
-              {isAuthenticated() && !esInstructorDelCurso() && (
-                <div className="bg-gradient-to-r from-upb-blue-50 to-blue-50 p-5 rounded-xl">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">
-                    {miCalificacion ? '⭐ Tu calificación:' : '✨ ¿Qué te pareció este curso?'}
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <StarRating 
-                      rating={miCalificacion?.puntuacion || 0} 
-                      onRate={handleCalificar}
-                      size={32}
-                      readonly={cargandoCalificacion}
-                    />
-                    {miCalificacion && (
+                {/* Video actual info */}
+                {videoActual && (
+                  <div className="mt-6 pt-6 border-t">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                        <span className="w-8 h-8 bg-upb-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          {videoActual.numero}
+                        </span>
+                        {videoActual.titulo}
+                      </h2>
+                      {/* 🆕 Contador de vistas del video */}
+                      {videoActual.totalVistas !== undefined && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                          <Eye size={16} />
+                          <span className="font-semibold">{videoActual.totalVistas}</span>
+                          <span>vistas</span>
+                        </div>
+                      )}
+                    </div>
+                    {videoActual.descripcion ? (
+                      <p className="text-gray-600 leading-relaxed pl-11">
+                        {videoActual.descripcion}
+                      </p>
+                    ) : (
+                      <p className="text-gray-400 italic pl-11">
+                        Sin descripción disponible
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-2xl shadow-upb-lg p-6 sticky top-8">
+                <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+                  <Film className="text-upb-blue-600" size={24} />
+                  Contenido del Curso
+                </h3>
+
+                {/* Botones de acción para instructor */}
+                {esInstructorDelCurso() && (
+                  <div className="mb-4 space-y-3">
+                    <button
+                      onClick={() => setVistaActual('agregar-video')}
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-upb-blue-500 to-upb-blue-600 text-white py-3 rounded-xl font-semibold hover:from-upb-blue-600 hover:to-upb-blue-700 transition-all duration-300 shadow-upb"
+                    >
+                      <Plus size={20} />
+                      Agregar Video
+                    </button>
+                    
+                    {videos.length > 0 && !cursoSeleccionado.publicado && (
                       <button
-                        onClick={handleEliminarCalificacion}
-                        disabled={cargandoCalificacion}
-                        className="text-red-600 hover:text-red-700 flex items-center gap-2 text-sm font-medium transition-colors"
-                        title="Eliminar calificación"
+                        onClick={() => publicarCurso(cursoSeleccionado.id)}
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg"
                       >
-                        <Trash2 size={16} />
-                        Eliminar
+                        ✓ Publicar Curso
                       </button>
                     )}
                   </div>
-                </div>
-              )}
-
-              {esInstructorDelCurso() && (
-                <div className="bg-gray-50 p-4 rounded-xl text-sm text-gray-600">
-                  ℹ️ No puedes calificar tu propio curso
-                </div>
-              )}
-            </div>
-
-            {/* Descripción */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">📋 Descripción del Curso</h3>
-              <p className="text-gray-600 leading-relaxed">{cursoSeleccionado.descripcion}</p>
-            </div>
-
-            {/* Estadísticas */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="bg-upb-blue-50 p-4 rounded-xl text-center">
-                <Film className="mx-auto mb-2 text-upb-blue-600" size={24} />
-                <div className="text-2xl font-bold text-gray-800">{cursoSeleccionado.videos}</div>
-                <div className="text-sm text-gray-600">Videos</div>
-              </div>
-              <div className="bg-upb-yellow-50 p-4 rounded-xl text-center">
-                <Clock className="mx-auto mb-2 text-upb-yellow-600" size={24} />
-                <div className="text-2xl font-bold text-gray-800">{cursoSeleccionado.duracion}</div>
-                <div className="text-sm text-gray-600">Duración</div>
-              </div>
-              <div className="bg-green-50 p-4 rounded-xl text-center">
-                <Award className="mx-auto mb-2 text-green-600" size={24} />
-                <div className="text-2xl font-bold text-gray-800">
-                  {resumenCalificaciones?.totalCalificaciones || 0}
-                </div>
-                <div className="text-sm text-gray-600">Valoraciones</div>
-              </div>
-            </div>
-
-            {/* Video actual info */}
-            {videoActual && (
-              <div className="mt-6 pt-6 border-t">
-                <h2 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-3">
-                  <span className="w-8 h-8 bg-upb-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                    {videoActual.numero}
-                  </span>
-                  {videoActual.titulo}
-                </h2>
-                {videoActual.descripcion ? (
-                  <p className="text-gray-600 leading-relaxed pl-11">
-                    {videoActual.descripcion}
-                  </p>
-                ) : (
-                  <p className="text-gray-400 italic pl-11">
-                    Sin descripción disponible
-                  </p>
                 )}
-              </div>
-            )}
-          </div>
-        </div>
 
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-upb-lg p-6 sticky top-8">
-            <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
-              <Film className="text-upb-blue-600" size={24} />
-              Contenido del Curso
-            </h3>
-
-            {/* Botones de acción para instructor */}
-            {esInstructorDelCurso() && (
-              <div className="mb-4 space-y-3">
-                <button
-                  onClick={() => setVistaActual('agregar-video')}
-                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-upb-blue-500 to-upb-blue-600 text-white py-3 rounded-xl font-semibold hover:from-upb-blue-600 hover:to-upb-blue-700 transition-all duration-300 shadow-upb"
-                >
-                  <Plus size={20} />
-                  Agregar Video
-                </button>
-                
-                {videos.length > 0 && !cursoSeleccionado.publicado && (
-                  <button
-                    onClick={() => publicarCurso(cursoSeleccionado.id)}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg"
-                  >
-                    ✓ Publicar Curso
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Lista de videos */}
-            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-              {videos.length > 0 ? (
-                videos.map((video) => (
-                  <div
-                    key={video.id}
-                    onClick={() => cambiarVideo(video)}
-                    className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 ${
-                      videoActual?.id === video.id 
-                        ? 'border-upb-blue-500 bg-upb-blue-50 shadow-md' 
-                        : 'border-gray-200 hover:border-upb-blue-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-md ${
-                      videoActual?.id === video.id
-                        ? 'bg-upb-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {video.numero}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-semibold text-sm truncate ${
-                        videoActual?.id === video.id ? 'text-upb-blue-900' : 'text-gray-800'
-                      }`}>
-                        {video.titulo}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Clock size={12} className="text-gray-500" />
-                        <p className="text-xs text-gray-500">{video.duracion}</p>
+                {/* Lista de videos */}
+                <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                  {videos.length > 0 ? (
+                    videos.map((video) => (
+                      <div
+                        key={video.id}
+                        onClick={() => cambiarVideo(video)}
+                        className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 ${
+                          videoActual?.id === video.id 
+                            ? 'border-upb-blue-500 bg-upb-blue-50 shadow-md' 
+                            : 'border-gray-200 hover:border-upb-blue-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-md ${
+                          videoActual?.id === video.id
+                            ? 'bg-upb-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {video.numero}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-semibold text-sm truncate ${
+                            videoActual?.id === video.id ? 'text-upb-blue-900' : 'text-gray-800'
+                          }`}>
+                            {video.titulo}
+                          </p>
+                          <div className="flex items-center gap-3 mt-1">
+                            <div className="flex items-center gap-1">
+                              <Clock size={12} className="text-gray-500" />
+                              <p className="text-xs text-gray-500">{video.duracion}</p>
+                            </div>
+                            {/* 🆕 Vistas del video en la lista */}
+                            {video.totalVistas !== undefined && (
+                              <div className="flex items-center gap-1">
+                                <Eye size={12} className="text-purple-500" />
+                                <p className="text-xs text-purple-600 font-semibold">{video.totalVistas}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {videoActual?.id === video.id && (
+                          <Play size={16} className="text-upb-blue-600 flex-shrink-0" />
+                        )}
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-12">
+                      <Film size={48} className="mx-auto text-gray-300 mb-3" />
+                      <p className="text-gray-500 font-medium">No hay videos en este curso</p>
+                      {esInstructorDelCurso() && (
+                        <p className="text-sm text-gray-400 mt-2">Comienza agregando tu primer video</p>
+                      )}
                     </div>
-                    {videoActual?.id === video.id && (
-                      <Play size={16} className="text-upb-blue-600 flex-shrink-0" />
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-12">
-                  <Film size={48} className="mx-auto text-gray-300 mb-3" />
-                  <p className="text-gray-500 font-medium">No hay videos en este curso</p>
-                  {esInstructorDelCurso() && (
-                    <p className="text-sm text-gray-400 mt-2">Comienza agregando tu primer video</p>
                   )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
       </div>
-    ) : null}
-  </div>
 
-  {/* Estilos para scrollbar personalizado */}
-  <style jsx>{`
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #0D47A1;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #0A3D8F;
-    }
-  `}</style>
-</div>
-);
+      {/* Estilos para scrollbar personalizado */}
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #0D47A1;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #0A3D8F;
+        }
+      `}</style>
+    </div>
+  );
 }

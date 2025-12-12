@@ -13,6 +13,7 @@ import AdminUsuarios from './components/AdminUsuarios';
 import AdminCursos from './components/AdminCursos';
 import AdminCategorias from './components/AdminCategorias';
 import AdminCalificaciones from './components/AdminCalificaciones';
+import AdminVisualizaciones from './components/AdminVisualizaciones';
 
 function AppContent() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -145,6 +146,10 @@ function AppContent() {
           
           {vistaActual === 'admin-calificaciones' && (
             <AdminCalificaciones setVistaActual={setVistaActual} />
+          )}
+          
+          {vistaActual === 'admin-visualizaciones' && (
+            <AdminVisualizaciones setVistaActual={setVistaActual} />
           )}
         </>
       )}

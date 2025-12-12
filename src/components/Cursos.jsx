@@ -1,6 +1,6 @@
 // src/components/Cursos.jsx
 import React, { useEffect, useState } from 'react';
-import { Play, Search, Star, Filter, Grid, List } from 'lucide-react';
+import { Play, Search, Star, Filter, Grid, List, Eye } from 'lucide-react';
 import { calificacionesAPI } from '../services/api';
 
 export default function Cursos({ 
@@ -197,6 +197,14 @@ export default function Cursos({
                         </span>
                         <span className="font-semibold text-upb-blue-600">{curso.duracion}</span>
                       </div>
+
+                      {/* 🆕 Visualizaciones en vista lista */}
+                      {curso.totalVistas !== undefined && curso.totalVistas > 0 && (
+                        <div className="flex items-center gap-2 mt-3 pt-3 border-t text-purple-600">
+                          <Eye size={16} />
+                          <span className="text-sm font-semibold">{curso.totalVistas.toLocaleString()} vistas</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -257,6 +265,14 @@ export default function Cursos({
                       </span>
                       <span className="font-semibold text-upb-blue-600">{curso.duracion}</span>
                     </div>
+
+                    {/* 🆕 Visualizaciones en vista grid */}
+                    {curso.totalVistas !== undefined && curso.totalVistas > 0 && (
+                      <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t text-purple-600">
+                        <Eye size={14} />
+                        <span className="text-sm font-semibold">{curso.totalVistas.toLocaleString()} vistas</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
