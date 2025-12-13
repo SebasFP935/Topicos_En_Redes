@@ -110,7 +110,7 @@ export default function AdminCategorias({ setVistaActual }) {
               <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
               Volver al Dashboard
             </button>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">🏷️ Gestión de Categorías</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Gestión de Categorías</h1>
             <p className="text-gray-600">Organiza los cursos por temáticas</p>
           </div>
           <button

@@ -87,6 +87,13 @@ export const categoriasAPI = {
   eliminar: (id) => api.delete(`/categorias/${id}`),
 };
 
+// Cupones APIs
+export const cuponesAPI = {
+  obtenerCuponDisponible: (cursoId) => api.get(`/cupones/curso/${cursoId}/disponible`),
+  obtenerCuponesPorCurso: (cursoId) => api.get(`/cupones/curso/${cursoId}`),
+  marcarComoUsado: (codigoCupon) => api.post('/cupones/marcar-usado', { codigoCupon }),
+};
+
 // Calificaciones APIs
 export const calificacionesAPI = {
   calificar: (cursoId, puntuacion) => api.post(`/calificaciones/curso/${cursoId}`, { puntuacion }),

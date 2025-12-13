@@ -112,7 +112,7 @@ export default function AdminCalificaciones({ setVistaActual }) {
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             Volver al Dashboard
           </button>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">⭐ Gestión de Calificaciones</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Gestión de Calificaciones</h1>
           <p className="text-gray-600">Administra todas las valoraciones de los cursos</p>
         </div>
 

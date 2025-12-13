@@ -2,8 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Plus, Trash2, Clock, Film, Award, Share2, Bookmark, ArrowLeft, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { calificacionesAPI, visualizacionesAPI } from '../services/api';
+import { calificacionesAPI, visualizacionesAPI, cuponesAPI } from '../services/api';
 import StarRating from './StarRating';
+import CuponBanner from './CuponBanner';
 
 export default function CursoDetalle({ 
   cursoSeleccionado, 
@@ -17,6 +18,7 @@ export default function CursoDetalle({
   const [miCalificacion, setMiCalificacion] = useState(null);
   const [resumenCalificaciones, setResumenCalificaciones] = useState(null);
   const [cargandoCalificacion, setCargandoCalificacion] = useState(false);
+  const [cuponDisponible, setCuponDisponible] = useState(null); // 🆕 Estado para cupón
   const videoRef = useRef(null);
   const vistaRegistrada = useRef(false);
 
@@ -37,6 +39,11 @@ export default function CursoDetalle({
             await visualizacionesAPI.registrarVista(videoActual.id);
             vistaRegistrada.current = true;
             console.log(`Vista registrada para video ${videoActual.id}`);
+            
+            // 🆕 Recargar cupón después de registrar vista (por si se generó uno nuevo)
+            setTimeout(() => {
+              cargarCuponDisponible();
+            }, 1000);
           } catch (error) {
             console.error('Error al registrar vista:', error);
           }
@@ -55,11 +62,28 @@ export default function CursoDetalle({
   useEffect(() => {
     if (cursoSeleccionado) {
       cargarResumenCalificaciones();
+      cargarCuponDisponible(); // 🆕 Cargar cupón si existe
       if (isAuthenticated()) {
         cargarMiCalificacion();
       }
     }
   }, [cursoSeleccionado]);
+
+  // 🆕 Función para cargar cupón disponible
+  const cargarCuponDisponible = async () => {
+    try {
+      const response = await cuponesAPI.obtenerCuponDisponible(cursoSeleccionado.id);
+      if (response.status === 200 && response.data) {
+        setCuponDisponible(response.data);
+        console.log('Cupón disponible cargado:', response.data);
+      }
+    } catch (error) {
+      // Si no hay cupón disponible, es normal (204 No Content)
+      if (error.response?.status !== 204) {
+        console.error('Error al cargar cupón:', error);
+      }
+    }
+  };
 
   const cargarResumenCalificaciones = async () => {
     try {
@@ -111,7 +135,7 @@ export default function CursoDetalle({
 
   const cambiarVideo = (video) => {
     setVideoActual(video);
-    vistaRegistrada.current = false; // Reset para el nuevo video
+    vistaRegistrada.current = false;
   };
 
   const esInstructorDelCurso = () => {
@@ -166,6 +190,13 @@ export default function CursoDetalle({
 
               {/* Información del curso */}
               <div className="bg-white rounded-2xl shadow-upb-lg p-8">
+                {/* 🆕 Banner de Cupón (si existe) */}
+                {cuponDisponible && cuponDisponible.vigente && (
+                  <div className="mb-8">
+                    <CuponBanner cupon={cuponDisponible} />
+                  </div>
+                )}
+
                 {/* Header del curso */}
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex-1">
@@ -179,6 +210,14 @@ export default function CursoDetalle({
                         {cursoSeleccionado.categoria}
                       </span>
                     </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" title="Compartir">
+                      <Share2 size={20} className="text-gray-600" />
+                    </button>
+                    <button className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" title="Guardar">
+                      <Bookmark size={20} className="text-gray-600" />
+                    </button>
                   </div>
                 </div>
 
@@ -264,7 +303,7 @@ export default function CursoDetalle({
                     </div>
                     <div className="text-sm text-gray-600">Valoraciones</div>
                   </div>
-                  {/* 🆕 Visualizaciones totales del curso */}
+                  {/* Visualizaciones totales del curso */}
                   <div className="bg-purple-50 p-4 rounded-xl text-center md:col-span-3">
                     <Eye className="mx-auto mb-2 text-purple-600" size={24} />
                     <div className="text-2xl font-bold text-gray-800">
@@ -284,7 +323,7 @@ export default function CursoDetalle({
                         </span>
                         {videoActual.titulo}
                       </h2>
-                      {/* 🆕 Contador de vistas del video */}
+                      {/* Contador de vistas del video */}
                       {videoActual.totalVistas !== undefined && (
                         <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
                           <Eye size={16} />

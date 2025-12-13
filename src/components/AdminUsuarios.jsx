@@ -146,7 +146,7 @@ export default function AdminUsuarios({ setVistaActual }) {
           </button>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-800 mb-2">👥 Gestión de Usuarios</h1>
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">Gestión de Usuarios</h1>
               <p className="text-gray-600">Administra todos los usuarios de la plataforma</p>
             </div>
             <button

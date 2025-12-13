@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Home from './components/Home';
 import Cursos from './components/Cursos';
 import CursoDetalle from './components/CursoDetalle';
+import CuponBanner from './components/CuponBanner';
 import SubirContenido from './components/SubirContenido';
 import AgregarVideo from './components/AgregarVideo';
 import AdminDashboard from './components/AdminDashboard';

@@ -64,7 +64,7 @@ export default function AdminCursos({ setVistaActual, verDetalleCurso }) {
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             Volver al Dashboard
           </button>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">📚 Gestión de Cursos</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Gestión de Cursos</h1>
           <p className="text-gray-600">Administra todos los cursos de la plataforma</p>
         </div>
 
