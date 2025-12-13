@@ -222,7 +222,7 @@ export default function AdminDashboard({ setVistaActual }) {
                   <div className="flex justify-between items-center py-4 border-b-2 border-gray-100 hover:bg-gray-50 px-4 rounded-lg transition-colors">
                     <span className="text-gray-700 font-semibold flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      Usuarios Activos
+                      Usuarios del Sistema
                     </span>
                     <span className="text-2xl font-bold text-gray-800">
                       {estadisticas?.totalUsuarios || 0}

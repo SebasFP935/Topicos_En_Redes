@@ -180,14 +180,6 @@ export default function CursoDetalle({
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" title="Compartir">
-                      <Share2 size={20} className="text-gray-600" />
-                    </button>
-                    <button className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" title="Guardar">
-                      <Bookmark size={20} className="text-gray-600" />
-                    </button>
-                  </div>
                 </div>
 
                 {/* Calificaciones */}
@@ -376,7 +368,7 @@ export default function CursoDetalle({
                               <Clock size={12} className="text-gray-500" />
                               <p className="text-xs text-gray-500">{video.duracion}</p>
                             </div>
-                            {/* 🆕 Vistas del video en la lista */}
+                            {/* Vistas del video en la lista */}
                             {video.totalVistas !== undefined && (
                               <div className="flex items-center gap-1">
                                 <Eye size={12} className="text-purple-500" />
