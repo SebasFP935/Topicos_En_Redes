@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Users, BookOpen, Video, TrendingUp, Star, ArrowRight, BarChart3, Activity, Eye } from 'lucide-react';
+import { Users, BookOpen, Video, TrendingUp, Star, ArrowRight, BarChart3, Activity, Eye, DollarSign } from 'lucide-react';
 import { useAdmin } from '../hooks/UseAdmin';
 
 export default function AdminDashboard({ setVistaActual }) {

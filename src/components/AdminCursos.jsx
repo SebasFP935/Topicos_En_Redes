@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Trash2, Eye, CheckCircle, XCircle, Filter, ArrowLeft } from 'lucide-react';
+import { Search, Trash2, Eye, CheckCircle, XCircle, Filter, ArrowLeft, DollarSign } from 'lucide-react';
 import { useAdmin } from '../hooks/UseAdmin';
 
 export default function AdminCursos({ setVistaActual, verDetalleCurso }) {

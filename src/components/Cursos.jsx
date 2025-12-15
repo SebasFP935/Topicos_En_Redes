@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Search, Star, Filter, Grid, List, Eye } from 'lucide-react';
+import  { DollarSign } from 'lucide-react';
 import { calificacionesAPI } from '../services/api';
 
 export default function Cursos({ 

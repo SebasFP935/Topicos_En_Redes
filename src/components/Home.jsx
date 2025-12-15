@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Star, Play, Award, Users, BookOpen, TrendingUp, ArrowRight, Eye } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { calificacionesAPI } from '../services/api';
 
 export default function Home({ cursos, categorias, cargando, setVistaActual, verDetalleCurso }) {

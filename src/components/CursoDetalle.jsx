@@ -2,6 +2,7 @@ import { Edit } from 'lucide-react';
 import EditarCursoModal from './EditarCurso';
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Plus, Trash2, Clock, Film, Award, Share2, Bookmark, ArrowLeft, Eye } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { calificacionesAPI, visualizacionesAPI, cuponesAPI } from '../services/api';
 import StarRating from './StarRating';
