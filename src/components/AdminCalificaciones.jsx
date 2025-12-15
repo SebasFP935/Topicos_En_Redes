@@ -1,4 +1,3 @@
-// src/components/AdminCalificaciones.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Trash2, Star, Filter, ArrowLeft, BookOpen, User, Calendar } from 'lucide-react';
 import { adminAPI } from '../services/api';

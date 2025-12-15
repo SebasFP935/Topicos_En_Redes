@@ -1,4 +1,3 @@
-// src/components/Cursos.jsx
 import React, { useEffect, useState } from 'react';
 import { Play, Search, Star, Filter, Grid, List, Eye } from 'lucide-react';
 import { calificacionesAPI } from '../services/api';
@@ -271,6 +270,23 @@ export default function Cursos({
                       <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t text-purple-600">
                         <Eye size={14} />
                         <span className="text-sm font-semibold">{curso.totalVistas.toLocaleString()} vistas</span>
+                      </div>
+                    )}
+                  </div>
+                  {/* 🆕 Precio del curso */}
+                  <div className="pt-3 border-t">
+                    {curso.precio && curso.precio > 0 ? (
+                      <div className="flex items-center justify-center gap-1 bg-green-50 px-3 py-2 rounded-lg">
+                        <DollarSign size={16} className="text-green-600" />
+                        <span className="text-lg font-bold text-green-600">
+                          {curso.precio.toFixed(2)} Bs
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-center bg-blue-50 px-3 py-2 rounded-lg">
+                        <span className="text-sm font-bold text-blue-600">
+                          🎁 GRATUITO
+                        </span>
                       </div>
                     )}
                   </div>

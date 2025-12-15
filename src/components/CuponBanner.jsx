@@ -1,4 +1,3 @@
-// src/components/CuponBanner.jsx
 import React, { useState } from 'react';
 import { Gift, Copy, Check, ExternalLink, Sparkles } from 'lucide-react';
 import { cuponesAPI } from '../services/api';

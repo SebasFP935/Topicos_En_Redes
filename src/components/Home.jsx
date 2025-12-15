@@ -103,7 +103,7 @@ export default function Home({ cursos, categorias, cargando, setVistaActual, ver
         </div>
       </div>
 
-      {/* Cursos destacados mejorados */}
+      {/* Cursos destacados */}
       <div className="max-w-7xl mx-auto px-4 py-20">
         <div className="flex items-center justify-between mb-12">
           <div>
@@ -185,6 +185,23 @@ export default function Home({ cursos, categorias, cargando, setVistaActual, ver
                       </div>
                     )}
                   </div>
+                    {/* 🆕 Precio */}
+                    <div className="pt-3 border-t">
+                      {curso.precio && curso.precio > 0 ? (
+                        <div className="flex items-center justify-center gap-1 bg-green-50 px-3 py-2 rounded-lg">
+                          <DollarSign size={16} className="text-green-600" />
+                          <span className="text-lg font-bold text-green-600">
+                            {curso.precio.toFixed(2)} Bs
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="text-center bg-blue-50 px-3 py-2 rounded-lg">
+                          <span className="text-sm font-bold text-blue-600">
+                            🎁 GRATIS
+                          </span>
+                        </div>
+                      )}
+                    </div>
                 </div>
               );
             })}

@@ -1,4 +1,3 @@
-// src/components/AdminCursos.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Trash2, Eye, CheckCircle, XCircle, Filter, ArrowLeft } from 'lucide-react';
 import { useAdmin } from '../hooks/UseAdmin';
@@ -142,6 +141,18 @@ export default function AdminCursos({ setVistaActual, verDetalleCurso }) {
                     <span className="font-semibold text-upb-blue-600">{curso.duracion}</span>
                   </div>
 
+                                    <div className="pt-4 border-t">
+                    {curso.precio && curso.precio > 0 ? (
+                      <div className="flex items-center gap-2 text-green-600">
+                        <DollarSign size={16} />
+                        <span className="font-bold">{curso.precio.toFixed(2)} Bs</span>
+                      </div>
+                    ) : (
+                      <div className="text-blue-600 font-semibold text-sm">
+                        Curso Gratuito
+                      </div>
+                    )}
+                  </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => verDetalleCurso(curso.id)}
@@ -181,9 +192,10 @@ export default function AdminCursos({ setVistaActual, verDetalleCurso }) {
                     >
                       <Trash2 size={16} />
                     </button>
-                  </div>
+                  </div>                  
                 </div>
               </div>
+              
             ))}
           </div>
         )}

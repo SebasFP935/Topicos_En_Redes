@@ -1,4 +1,5 @@
-// src/components/CursoDetalle.jsx
+import { Edit } from 'lucide-react';
+import EditarCursoModal from './EditarCurso';
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Plus, Trash2, Clock, Film, Award, Share2, Bookmark, ArrowLeft, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +22,7 @@ export default function CursoDetalle({
   const [cuponDisponible, setCuponDisponible] = useState(null); // 🆕 Estado para cupón
   const videoRef = useRef(null);
   const vistaRegistrada = useRef(false);
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
 
   useEffect(() => {
     if (videos.length > 0 && !videoActual) {
@@ -189,6 +191,52 @@ export default function CursoDetalle({
               </div>
 
               {/* Información del curso */}
+              <div className="mb-6 pb-6 border-b">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                      {cursoSeleccionado.titulo}
+                    </h2>
+                    
+                    {/* 🆕 Mostrar precio */}
+                    {cursoSeleccionado.precio && cursoSeleccionado.precio > 0 ? (
+                      <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-xl inline-block">
+                        <DollarSign size={20} className="text-green-600" />
+                        <span className="text-2xl font-bold text-green-600">
+                          {cursoSeleccionado.precio.toFixed(2)} Bs
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="bg-blue-50 px-4 py-2 rounded-xl inline-block">
+                        <span className="text-lg font-bold text-blue-600">
+                          Curso Gratuito
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 🆕 Botón Editar (solo para instructor del curso) */}
+                  {esInstructorDelCurso() && (
+                    <button
+                      onClick={() => setMostrarModalEditar(true)}
+                      className="flex items-center gap-2 bg-upb-blue-50 text-upb-blue-600 px-4 py-2 rounded-xl hover:bg-upb-blue-100 transition-all font-semibold"
+                    >
+                      <Edit size={18} />
+                      Editar Curso
+                    </button>
+                  )}
+                </div>
+                {mostrarModalEditar && (
+                  <EditarCursoModal
+                    cursoId={cursoSeleccionado.id}
+                    onClose={() => setMostrarModalEditar(false)}
+                    onSuccess={() => {
+                      verDetalleCurso(cursoSeleccionado.id);
+                      setMostrarModalEditar(false);
+                    }}
+                  />
+                )}
+              </div>
               <div className="bg-white rounded-2xl shadow-upb-lg p-8">
                 {/* 🆕 Banner de Cupón (si existe) */}
                 {cuponDisponible && cuponDisponible.vigente && (
@@ -210,14 +258,6 @@ export default function CursoDetalle({
                         {cursoSeleccionado.categoria}
                       </span>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" title="Compartir">
-                      <Share2 size={20} className="text-gray-600" />
-                    </button>
-                    <button className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" title="Guardar">
-                      <Bookmark size={20} className="text-gray-600" />
-                    </button>
                   </div>
                 </div>
 
@@ -280,7 +320,7 @@ export default function CursoDetalle({
 
                 {/* Descripción */}
                 <div className="mb-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-3">📋 Descripción del Curso</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-3">Descripción del Curso</h3>
                   <p className="text-gray-600 leading-relaxed">{cursoSeleccionado.descripcion}</p>
                 </div>
 

@@ -1,4 +1,3 @@
-// src/components/AdminUsuarios.jsx
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Edit2, Trash2, CheckCircle, XCircle, Search, Filter, ArrowLeft, Users, Mail, Shield, GraduationCap, User } from 'lucide-react';
 import { useAdmin } from '../hooks/UseAdmin';

@@ -1,4 +1,3 @@
-// src/components/NavBar.jsx
 import React, { useState } from 'react';
 import { BookOpen, User, Upload, Menu, X, LogOut, Shield, GraduationCap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';

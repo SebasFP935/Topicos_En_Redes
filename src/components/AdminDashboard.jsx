@@ -1,4 +1,3 @@
-// src/components/AdminDashboard.jsx
 import React, { useEffect } from 'react';
 import { Users, BookOpen, Video, TrendingUp, Star, ArrowRight, BarChart3, Activity, Eye } from 'lucide-react';
 import { useAdmin } from '../hooks/UseAdmin';

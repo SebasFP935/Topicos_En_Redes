@@ -1,4 +1,3 @@
-// src/components/AdminCategorias.jsx
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, ArrowLeft, Tag } from 'lucide-react';
 import { categoriasAPI } from '../services/api';

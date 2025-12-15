@@ -1,4 +1,3 @@
-// src/components/AgregarVideo.jsx
 import React, { useState } from 'react';
 import { ArrowLeft, Film, FileText, Hash, Clock, Upload, CheckCircle, AlertCircle } from 'lucide-react';
 import { videosAPI } from '../services/api';
@@ -103,7 +102,7 @@ export default function AgregarVideo({ cursoSeleccionado, setVistaActual, verDet
               <Film size={150} />
             </div>
             <div className="relative z-10">
-              <h1 className="text-4xl font-bold mb-2">🎥 Agregar Video</h1>
+              <h1 className="text-4xl font-bold mb-2">Agregar Video</h1>
               <p className="text-blue-100 text-lg">
                 Curso: <span className="font-semibold">{cursoSeleccionado?.titulo}</span>
               </p>

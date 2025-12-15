@@ -1,7 +1,7 @@
-// src/components/SubirContenido.jsx
 import React, { useState } from 'react';
 import { ArrowLeft, BookOpen, FileText, Tag, Image as ImageIcon, Upload, CheckCircle } from 'lucide-react';
 import { cursosAPI } from '../services/api';
+import { DollarSign } from 'lucide-react';
 
 export default function SubirContenido({ categorias, setVistaActual }) {
   const [titulo, setTitulo] = useState('');
@@ -11,6 +11,7 @@ export default function SubirContenido({ categorias, setVistaActual }) {
   const [imagenPreview, setImagenPreview] = useState(null);
   const [errorSubida, setErrorSubida] = useState('');
   const [exito, setExito] = useState(false);
+  const [precio, setPrecio] = useState('');
 
   const handleImagenChange = (e) => {
     const file = e.target.files[0];
@@ -35,6 +36,9 @@ export default function SubirContenido({ categorias, setVistaActual }) {
     formData.append('categoriaId', categoriaId);
     if (imagen) {
       formData.append('imagen', imagen);
+    }
+    if (precio) {
+      formData.append('precio', parseFloat(precio));
     }
 
     try {
@@ -163,6 +167,26 @@ export default function SubirContenido({ categorias, setVistaActual }) {
                   ))}
                 </select>
                 <p className="text-xs text-gray-500 mt-2">Ayuda a los estudiantes a encontrar tu curso</p>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
+                  <DollarSign size={18} className="text-green-600" />
+                  Precio del Curso (Bs)
+                  <span className="text-gray-400 text-xs font-normal">(Opcional)</span>
+                </label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  value={precio}
+                  onChange={(e) => setPrecio(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" 
+                  placeholder="0.00"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Dejar vacío para curso gratuito. Se sincronizará con UPBolis
+                </p>
               </div>
 
               {/* Imagen de Portada */}
