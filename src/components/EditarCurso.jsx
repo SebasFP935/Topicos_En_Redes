@@ -73,8 +73,11 @@ export default function EditarCursoModal({ cursoId, onClose, onSuccess }) {
     datos.append('descripcion', formData.descripcion);
     datos.append('categoriaId', formData.categoriaId);
     
-    if (formData.precio !== '') {
-      datos.append('precio', parseFloat(formData.precio));
+    // 🔧 FIX: Siempre enviar el precio, incluso si es vacío/0
+    if (formData.precio !== '' && formData.precio !== null) {
+      datos.append('precio', parseFloat(formData.precio) || 0);
+    } else {
+      datos.append('precio', 0);
     }
     
     if (formData.imagen) {
@@ -82,11 +85,38 @@ export default function EditarCursoModal({ cursoId, onClose, onSuccess }) {
     }
 
     try {
-      await cursosAPI.actualizar(cursoId, datos);
-      onSuccess();
-      onClose();
+      const response = await cursosAPI.actualizar(cursoId, datos);
+      
+      // ✅ Verificar que la respuesta sea exitosa
+      if (response && response.data) {
+        console.log('✅ Curso actualizado correctamente:', response.data);
+        
+        // Llamar a onSuccess solo si todo salió bien
+        if (onSuccess) {
+          onSuccess();
+        }
+        
+        // Cerrar el modal
+        onClose();
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al actualizar el curso');
+      console.error('❌ Error al actualizar curso:', err);
+      
+      // 🔧 FIX: Mejorar detección de errores
+      if (err.response) {
+        // El servidor respondió con un código de error
+        const errorMsg = err.response.data?.message || 'Error al actualizar el curso';
+        setError(errorMsg);
+        console.error('Error del servidor:', err.response.data);
+      } else if (err.request) {
+        // La petición se hizo pero no hubo respuesta
+        setError('No se pudo conectar con el servidor. Por favor intenta de nuevo.');
+        console.error('Sin respuesta del servidor');
+      } else {
+        // Algo más salió mal
+        setError('Error inesperado al actualizar el curso');
+        console.error('Error:', err.message);
+      }
     } finally {
       setGuardando(false);
     }

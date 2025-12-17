@@ -2,11 +2,11 @@ import { Edit } from 'lucide-react';
 import EditarCursoModal from './EditarCurso';
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Plus, Trash2, Clock, Film, Award, Share2, Bookmark, ArrowLeft, Eye } from 'lucide-react';
-import { DollarSign } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { calificacionesAPI, visualizacionesAPI, cuponesAPI } from '../services/api';
 import StarRating from './StarRating';
 import CuponBanner from './CuponBanner';
+import { DollarSign } from 'lucide-react';
 
 export default function CursoDetalle({ 
   cursoSeleccionado, 
@@ -94,6 +94,22 @@ export default function CursoDetalle({
       setResumenCalificaciones(response.data);
     } catch (error) {
       console.error('Error al cargar resumen de calificaciones:', error);
+    }
+  };
+
+  const recargarCursoActual = async () => {
+    if (!cursoSeleccionado?.id) return;
+    
+    setCargando(true);
+    try {
+      const response = await cursosAPI.obtenerPorId(cursoSeleccionado.id);
+      setCursoSeleccionado(response.data);
+      setVideos(response.data.listaVideos || []);
+      console.log("✅ Curso recargado:", response.data);
+    } catch (err) {
+      console.error("Error al recargar curso:", err);
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -228,12 +244,12 @@ export default function CursoDetalle({
                   )}
                 </div>
                 {mostrarModalEditar && (
-                  <EditarCursoModal
+                  <EditarCursoModal 
                     cursoId={cursoSeleccionado.id}
                     onClose={() => setMostrarModalEditar(false)}
                     onSuccess={() => {
-                      verDetalleCurso(cursoSeleccionado.id);
                       setMostrarModalEditar(false);
+                      recargarCursoActual();
                     }}
                   />
                 )}
